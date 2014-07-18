@@ -1,4 +1,4 @@
-<pre><code class="Go">
+<pre><code class="go">
 package main
 
 import "fmt"
