@@ -1,5 +1,5 @@
 /**
- * https://gobyexample.com/multiple-return-values
+ * https://gobyexample.com/closures
  *
  * We call intSeq, assigning the result (a function) to nextInt. This function value captures its own i value, which will be updated each time we call nextInt.
  */
