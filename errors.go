@@ -23,6 +23,7 @@ type argError struct {
 	prob string
 }
 
+// inprements Error()
 func (e *argError) Error() string {
 	return fmt.Sprintf("%d - %s", e.arg, e.prob)
 }
