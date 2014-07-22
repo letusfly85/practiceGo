@@ -13,12 +13,6 @@ func main() {
 	signals := make(chan bool)
 
 	time.Sleep(time.Second * 1)
-	/*
-		go func() {
-			time.Sleep(time.Second * 1)
-			messages <- "aiueo"
-		}()
-	*/
 
 	msg := "hi"
 	select {
@@ -28,7 +22,6 @@ func main() {
 		fmt.Println("no message received")
 	}
 
-	msg = "hi"
 	select {
 	case messages <- msg:
 		fmt.Println("sent message", msg)
@@ -36,8 +29,9 @@ func main() {
 		fmt.Println("no message sent")
 	}
 
+	msg = "hihi"
 	select {
-	case msg := <-messages:
+	case messages <- msg:
 		fmt.Println("received message", msg)
 	case sig := <-signals:
 		fmt.Println("received signal", sig)
