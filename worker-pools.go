@@ -1,5 +1,5 @@
 /**
- * https://gobyexample.com/tickers
+ * https://gobyexample.com/worker-pools
  *
  */
 
