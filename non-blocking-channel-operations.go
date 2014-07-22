@@ -5,12 +5,22 @@
 
 package main
 
+import "time"
 import "fmt"
 
 func main() {
-	messages := make(chan string)
+	messages := make(chan string, 10)
 	signals := make(chan bool)
 
+	time.Sleep(time.Second * 1)
+	/*
+		go func() {
+			time.Sleep(time.Second * 1)
+			messages <- "aiueo"
+		}()
+	*/
+
+	msg := "hi"
 	select {
 	case msg := <-messages:
 		fmt.Println("received message", msg)
@@ -18,7 +28,7 @@ func main() {
 		fmt.Println("no message received")
 	}
 
-	msg := "hi"
+	msg = "hi"
 	select {
 	case messages <- msg:
 		fmt.Println("sent message", msg)
