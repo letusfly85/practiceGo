@@ -25,12 +25,12 @@ func main() {
 		go worker(w, jobs, results)
 	}
 
-	for j := 1; j <= 9; j++ {
+	for j := 1; j <= 10; j++ {
 		jobs <- j
 	}
 	close(jobs)
 
-	for a := 1; a <= 9; a++ {
+	for a := 1; a <= 10; a++ {
 		<-results
 	}
 }
