@@ -55,7 +55,7 @@ func main() {
 	time.Sleep(time.Second)
 
 	opsFinal := atomic.LoadInt64(&ops)
-	fmt.Println("ops:", opsFinal)
+	fmt.Println("ops  :", opsFinal)
 
 	mutex.Lock()
 	fmt.Println("state:", state)
