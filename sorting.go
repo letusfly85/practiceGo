@@ -1,5 +1,5 @@
 /**
- * https://gobyexample.com/range
+ * https://gobyexample.com/sorting
  *
  */
 
