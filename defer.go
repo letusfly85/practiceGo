@@ -1,5 +1,5 @@
 /**
- * https://gobyexample.com/sorting-by-functions
+ * https://gobyexample.com/defer
  *
  */
 
