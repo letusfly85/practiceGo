@@ -1,3 +1,5 @@
+#practice Go
+
 ## explain
 
 this is notes to learn a programming language "go".
