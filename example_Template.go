@@ -32,10 +32,15 @@ Josie
 		{"Cousin Rondney", "", false},
 	}
 
+	f, err_f := os.Create("sample.txt")
 	t := template.Must(template.New("letter").Parse(letter))
+	if err_f != nil {
+		log.Println("executing template:", err_f)
+	}
 
 	for _, r := range recipients {
-		err := t.Execute(os.Stdout, r)
+		//err := t.Execute(os.Stdout, r)
+		err := t.Execute(f, r)
 		if err != nil {
 			log.Println("executing template:", err)
 		}
