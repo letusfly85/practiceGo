@@ -19,5 +19,7 @@ func main() {
 </code></pre>
 
 <pre>
-run go hello.go
+go build hello.go
+
+hello
 </pre>
