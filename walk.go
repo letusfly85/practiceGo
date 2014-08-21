@@ -13,20 +13,19 @@ import "path/filepath"
 
 func main() {
 
-	root := "~/WORK"
+	//root := "~/WORK"
+	root := "C:\\Learning"
+
 	err := filepath.Walk(root,
 		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				fmt.Println("todo")
-				fmt.Println(path)
-			} else {
-				fmt.Println(err)
-			}
+
+			rel, err := filepath.Rel(root, path)
+			fmt.Println(rel)
 
 			return nil
 		})
 
 	if err != nil {
-		fmt.Println(1, err)
+		//fmt.Println(1, err)
 	}
 }
