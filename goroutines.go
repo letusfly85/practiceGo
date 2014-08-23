@@ -15,6 +15,14 @@ func f(from string) {
 
 func main() {
 
+	i := 1
+	var ary [100]int
+	for i < 100 {
+		ary[i] = 100 - i
+		i += 1
+	}
+	fmt.Println(ary)
+
 	f("direct")
 
 	go f("goroutine")
