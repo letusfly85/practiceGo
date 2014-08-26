@@ -8,6 +8,18 @@ package main
 import "time"
 import "fmt"
 
+func foo() {
+	for {
+		select {
+		case t1 := <-time.After(time.Second):
+			fmt.Println("hello", t1)
+			if t1.Second()%4 == 0 {
+				return
+			}
+		}
+	}
+}
+
 func main() {
 
 	c1 := make(chan string)
@@ -30,4 +42,7 @@ func main() {
 			fmt.Println("received", msg2)
 		}
 	}
+
+	foo()
+	fmt.Println("end")
 }
