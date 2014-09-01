@@ -1,25 +1,9 @@
-#practice golang
+# practice golang
 
-## explain
+## Wiki
 
-this is notes to learn a programming language "go".
-using below site.
-https://gobyexample.com
+https://github.com/letusfly85/practiceGo/wiki/Index
 
-##example
+## 説明
 
-<pre class="golang"><code>
-package main
-
-import "fmt"
-
-func main() {
-	fmt.Println("go" + "lang")
-}
-</code></pre>
-
-<pre>
-go build hello.go
-
-hello
-</pre>
+Go学習用のリポジトリです。
