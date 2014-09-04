@@ -12,7 +12,7 @@ func timeout(t chan bool) {
 
 func readString(s chan string) {
 	time.Sleep(10000 * 1000 * 1000)
-	msg := "Hello, World!"
+	msg := "This is another timeout!"
 	s <- msg
 }
 
