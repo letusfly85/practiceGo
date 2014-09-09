@@ -15,12 +15,21 @@ type MyOutput struct {
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
-		var output = MyOutput{"Body", scanner.Text()}
-		enc := json.NewEncoder(os.Stdout)
+		text := scanner.Text()
 
-		err := enc.Encode(output)
-		if err != nil {
-			log.Fatal(err)
+		switch {
+		case text == "exit":
+			return
+
+		default:
+
+			var output = MyOutput{"Body", text}
+			enc := json.NewEncoder(os.Stdout)
+
+			err := enc.Encode(output)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 }
