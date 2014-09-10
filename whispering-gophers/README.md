@@ -8,7 +8,7 @@
 
 
 
-<pre class="golang">
+<pre><code class="golang">
 package main
 
 import (
@@ -46,4 +46,4 @@ func main() {
 		}
 	}
 }
-</pre>
+</code></pre>
