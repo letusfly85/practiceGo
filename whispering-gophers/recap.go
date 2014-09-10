@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 )
 import "encoding/json"
@@ -19,6 +20,7 @@ func main() {
 
 		switch {
 		case text == "exit":
+			fmt.Println("done")
 			return
 
 		default:
