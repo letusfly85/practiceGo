@@ -8,7 +8,7 @@
 
 
 
-```golang
+```Go
 package main
 
 import (
