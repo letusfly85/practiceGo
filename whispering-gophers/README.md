@@ -8,7 +8,7 @@
 
 
 
-<pre><code class="golang">
+<pre><code class="Go">
 package main
 
 import (
