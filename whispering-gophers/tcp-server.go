@@ -1,7 +1,7 @@
 /**
  * refs: http://whispering-gophers.appspot.com/talk.slide#16
  * refs: https://coderwall.com/p/wohavg
- *
+ * refs: http://d.hatena.ne.jp/taknb2nch/20140210/1392044307
  *
  *
  */
