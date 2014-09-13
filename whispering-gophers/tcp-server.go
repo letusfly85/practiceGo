@@ -9,9 +9,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"net"
 	"os"
 )
@@ -53,15 +50,6 @@ func handleRequest(conn net.Conn) {
 	}
 	s := string(buf[:reqLen])
 
-	var b bytes.Buffer
-	enc := json.NewEncoder(&b)
-	d := map[string]string{"message": s}
-	err = enc.Encode(d)
-	if err != nil {
-		fmt.Println(err)
-	}
-	str := b.String()
-
-	conn.Write([]byte(str))
+	conn.Write([]byte(s))
 	conn.Close()
 }

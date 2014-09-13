@@ -2,19 +2,25 @@
  * refs: http://whispering-gophers.appspot.com/talk.slide#16
  * refs: https://gist.github.com/iwanbk/2295233
  *
- *
+ * usage: go run sending-message-to-a-peer.go hoge
  *
  */
 
 package main
 
-import "net"
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net"
+)
 import "os"
 
 func main() {
-	strEcho := "hello! world!"
-	servAddr := "localhost:3333"
 
+	strEcho := os.Args[1]
+
+	servAddr := "localhost:3333"
 	tcpAddr, err := net.ResolveTCPAddr("tcp", servAddr)
 	if err != nil {
 		println("Resolve TCP address failed:", err.Error())
@@ -30,12 +36,20 @@ func main() {
 	}
 	defer conn.Close()
 
-	_, err = conn.Write([]byte(strEcho))
+	var b bytes.Buffer
+	enc := json.NewEncoder(&b)
+	d := map[string]string{"message": strEcho}
+	err = enc.Encode(d)
+	if err != nil {
+		fmt.Println(err)
+	}
+	str := b.String()
+
+	_, err = conn.Write([]byte(str))
 	if err != nil {
 		println("Write to server failed:", err.Error())
 		os.Exit(1)
 	}
-	println("write to server = ", strEcho)
 
 	reply := make([]byte, 1024)
 	_, err = conn.Read(reply)
