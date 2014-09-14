@@ -12,27 +12,31 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net"
 )
 import "os"
 
+// go run sending-messages-to-a-peer.go "message" "localhost:3333"
 func main() {
 
 	strEcho := os.Args[1]
-
-	servAddr := "localhost:3333"
-	tcpAddr, err := net.ResolveTCPAddr("tcp", servAddr)
+	servAddr := os.Args[2]
+	/*
+		tcpAddr, err := net.ResolveTCPAddr("tcp", servAddr)
+		if err != nil {
+			println("Resolve TCP address failed:", err.Error())
+			os.Exit(1)
+		}
+		conn, err := net.DialTCP("tcp", nil, tcpAddr)
+		if err != nil {
+			println("Dial failed:", err.Error())
+			os.Exit(1)
+		}
+	*/
+	conn, err := net.Dial("tcp", servAddr)
 	if err != nil {
-		println("Resolve TCP address failed:", err.Error())
-		os.Exit(1)
-	}
-	println(tcpAddr.IP)
-	println(tcpAddr.Port)
-
-	conn, err := net.DialTCP("tcp", nil, tcpAddr)
-	if err != nil {
-		println("Dial failed:", err.Error())
-		os.Exit(1)
+		log.Fatal(err)
 	}
 	defer conn.Close()
 
