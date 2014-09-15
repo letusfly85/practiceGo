@@ -13,26 +13,37 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net"
 )
 import "os"
 
 type Site struct {
+	Addr  string
 	Title string
 	URL   string
 }
 
+func check(e error) {
+	if e != nil {
+		log.Fatal(e)
+	}
+}
+
 func main() {
 	strEcho := os.Args[1]
-	servAddr := os.Args[2]
+	addr, err := ioutil.ReadFile("/tmp/tcp-serv-addr")
+	check(err)
+	servAddr := string(addr)
+
 	conn, err := net.Dial("tcp", servAddr)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer conn.Close()
 
-	var site = Site{Title: strEcho, URL: servAddr}
+	var site = Site{Addr: "", Title: strEcho, URL: servAddr}
 	var b bytes.Buffer
 	enc := json.NewEncoder(&b)
 	err = enc.Encode(site)

@@ -13,28 +13,33 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
+
+	"code.google.com/p/whispering-gophers/util"
 )
 
 type Site struct {
+	Addr  string
 	Title string
 	URL   string
 }
 
-const (
-	CONN_HOST = "localhost"
-	CONN_PORT = "3333"
-	CONN_TYPE = "tcp"
-)
+func check(e error) {
+	if e != nil {
+		log.Fatal(e)
+	}
+}
 
 func main() {
-	//l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
-	l, err := net.Listen(CONN_TYPE, ":"+CONN_PORT)
+	l, err := util.Listen()
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Println(l.Addr())
+	err = ioutil.WriteFile("/tmp/tcp-serv-addr", ([]byte(l.Addr().String())), 0644)
+	check(err)
 	defer l.Close()
 
 	for {
@@ -58,7 +63,8 @@ func handleRequest(conn net.Conn, addr string) {
 
 	site := new(Site)
 	err = json.Unmarshal([]byte(s), &site)
-	fmt.Fprintln(conn, site.Title)
-	println(site.Title, addr)
+	site.Addr = addr
+	fmt.Fprintln(conn, (site.Addr + "\t" + site.Title))
+	println(site.Addr, site.Title)
 	io.Copy(conn, conn)
 }
