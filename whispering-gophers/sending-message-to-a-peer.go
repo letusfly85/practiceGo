@@ -13,7 +13,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net"
 )
@@ -24,9 +23,7 @@ type Site struct {
 	URL   string
 }
 
-// go run sending-messages-to-a-peer.go "message" "localhost:3333"
 func main() {
-
 	strEcho := os.Args[1]
 	servAddr := os.Args[2]
 	conn, err := net.Dial("tcp", servAddr)
@@ -40,21 +37,20 @@ func main() {
 	enc := json.NewEncoder(&b)
 	err = enc.Encode(site)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	str := b.String()
-	println(str)
 	_, err = conn.Write([]byte(str))
 	if err != nil {
-		println("Write to server failed:", err.Error())
+		log.Fatal(err)
 		os.Exit(1)
 	}
 
 	reply := make([]byte, 1024)
 	_, err = conn.Read(reply)
 	if err != nil {
-		println("Reply From server failed:", err.Error())
+		log.Fatal(err)
 		os.Exit(1)
 	}
 	println("reply from server=", string(reply))

@@ -12,6 +12,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net"
 )
@@ -28,24 +29,24 @@ const (
 )
 
 func main() {
-	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
+	//l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
+	l, err := net.Listen(CONN_TYPE, ":"+CONN_PORT)
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	log.Println(l.Addr())
 	defer l.Close()
 
-	println("Listening on " + CONN_HOST + ":" + CONN_PORT)
 	for {
 		conn, err := l.Accept()
 		if err != nil {
 			log.Fatal(err)
 		}
-		go handleRequest(conn)
+		go handleRequest(conn, l.Addr().String())
 	}
 }
 
-func handleRequest(conn net.Conn) {
+func handleRequest(conn net.Conn, addr string) {
 	defer conn.Close()
 
 	buf := make([]byte, 1024)
@@ -57,6 +58,7 @@ func handleRequest(conn net.Conn) {
 
 	site := new(Site)
 	err = json.Unmarshal([]byte(s), &site)
-	fmt.Fprintln(conn, site.URL)
-	//io.Copy(conn, conn)
+	fmt.Fprintln(conn, site.Title)
+	println(site.Title, addr)
+	io.Copy(conn, conn)
 }
