@@ -82,7 +82,7 @@ func main() {
 	conn, err := net.Dial("tcp", servAddr)
 	check(err)
 	defer conn.Close()
-	msgCh := make(chan string)
+	msgCh := make(chan string, 10)
 
 	go reactiveMessage(msgCh, conn, servAddr)
 	readMessage(msgCh)
