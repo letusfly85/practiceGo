@@ -11,6 +11,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
@@ -20,9 +21,9 @@ import (
 import "os"
 
 type Site struct {
-	Addr  string
-	Title string
-	URL   string
+	Addr    string
+	Message string
+	URL     string
 }
 
 func check(e error) {
@@ -31,38 +32,58 @@ func check(e error) {
 	}
 }
 
+var (
+	msgCh chan string
+)
+
+func readMessage(msgCh chan string) {
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		msgCh <- scanner.Text()
+	}
+}
+
+func reactiveMessage(msgCh chan string, conn net.Conn, servAddr string) {
+	for {
+		select {
+		case message, ok := <-msgCh:
+			if !ok {
+				os.Exit(1)
+			}
+			var site = Site{Addr: "", Message: message, URL: servAddr}
+			var b bytes.Buffer
+			enc := json.NewEncoder(&b)
+			err := enc.Encode(site)
+			check(err)
+
+			str := b.String()
+			_, err = conn.Write([]byte(str))
+			if err != nil {
+				log.Fatal(err)
+				os.Exit(1)
+			}
+
+			reply := make([]byte, 1024)
+			_, err = conn.Read(reply)
+			if err != nil {
+				log.Fatal(err)
+				os.Exit(1)
+			}
+			println("reply from server=", string(reply))
+		}
+	}
+}
+
 func main() {
-	strEcho := os.Args[1]
 	addr, err := ioutil.ReadFile("/tmp/tcp-serv-addr")
 	check(err)
 	servAddr := string(addr)
 
 	conn, err := net.Dial("tcp", servAddr)
-	if err != nil {
-		log.Fatal(err)
-	}
+	check(err)
 	defer conn.Close()
+	msgCh := make(chan string)
 
-	var site = Site{Addr: "", Title: strEcho, URL: servAddr}
-	var b bytes.Buffer
-	enc := json.NewEncoder(&b)
-	err = enc.Encode(site)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	str := b.String()
-	_, err = conn.Write([]byte(str))
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-
-	reply := make([]byte, 1024)
-	_, err = conn.Read(reply)
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-	println("reply from server=", string(reply))
+	go reactiveMessage(msgCh, conn, servAddr)
+	readMessage(msgCh)
 }
