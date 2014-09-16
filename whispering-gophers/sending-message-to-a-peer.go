@@ -2,50 +2,67 @@
  * refs: http://whispering-gophers.appspot.com/talk.slide#16
  * refs: https://gist.github.com/iwanbk/2295233
  *
+ * usage: go run sending-message-to-a-peer.go hoge
+ *
  *
  *
  */
 
 package main
 
-import "net"
+import (
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
+	"log"
+	"net"
+)
 import "os"
 
+type Site struct {
+	Addr  string
+	Title string
+	URL   string
+}
+
+func check(e error) {
+	if e != nil {
+		log.Fatal(e)
+	}
+}
+
 func main() {
-	strEcho := "hello! world!"
-	servAddr := "localhost:3333"
+	strEcho := os.Args[1]
+	addr, err := ioutil.ReadFile("/tmp/tcp-serv-addr")
+	check(err)
+	servAddr := string(addr)
 
-	tcpAddr, err := net.ResolveTCPAddr("tcp", servAddr)
+	conn, err := net.Dial("tcp", servAddr)
 	if err != nil {
-		println("Resolve TCP address failed:", err.Error())
-		os.Exit(1)
+		log.Fatal(err)
 	}
-	println(tcpAddr.IP)
-	println(tcpAddr.Port)
+	defer conn.Close()
 
-	conn, err := net.DialTCP("tcp", nil, tcpAddr)
+	var site = Site{Addr: "", Title: strEcho, URL: servAddr}
+	var b bytes.Buffer
+	enc := json.NewEncoder(&b)
+	err = enc.Encode(site)
 	if err != nil {
-		println("Dial failed:", err.Error())
-		os.Exit(1)
-	}
-
-	_, err = conn.Write([]byte(strEcho))
-	if err != nil {
-		println("Write to server failed:", err.Error())
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
-	println("write to server = ", strEcho)
+	str := b.String()
+	_, err = conn.Write([]byte(str))
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
 
 	reply := make([]byte, 1024)
-
 	_, err = conn.Read(reply)
 	if err != nil {
-		println("Write to server failed:", err.Error())
+		log.Fatal(err)
 		os.Exit(1)
 	}
-
 	println("reply from server=", string(reply))
-
-	conn.Close()
 }
