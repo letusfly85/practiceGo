@@ -16,14 +16,23 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
+	"os"
+	"sync"
 
 	"code.google.com/p/whispering-gophers/util"
 )
 
+type Peers struct {
+	m  map[string]chan<- Message
+	mu sync.RWMutex
+}
+
+type Message string
+
 type Site struct {
-	Addr  string
-	Title string
-	URL   string
+	Addr    string
+	Message string
+	URL     string
 }
 
 func check(e error) {
@@ -34,19 +43,17 @@ func check(e error) {
 
 func main() {
 	l, err := util.Listen()
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println(l.Addr())
-	err = ioutil.WriteFile("/tmp/tcp-serv-addr", ([]byte(l.Addr().String())), 0644)
+	check(err)
+
+	servId := os.Args[1]
+	fileName := "/tmp/tcp-serv-" + servId
+	err = ioutil.WriteFile(fileName, ([]byte(l.Addr().String())), 0644)
 	check(err)
 	defer l.Close()
 
 	for {
 		conn, err := l.Accept()
-		if err != nil {
-			log.Fatal(err)
-		}
+		check(err)
 		go handleRequest(conn, l.Addr().String())
 	}
 }
@@ -56,15 +63,15 @@ func handleRequest(conn net.Conn, addr string) {
 
 	buf := make([]byte, 1024)
 	reqLen, err := conn.Read(buf)
-	if err != nil {
-		println("Error reading:", err.Error())
-	}
+	check(err)
 	s := string(buf[:reqLen])
 
 	site := new(Site)
 	err = json.Unmarshal([]byte(s), &site)
+	check(err)
+
 	site.Addr = addr
-	fmt.Fprintln(conn, (site.Addr + "\t" + site.Title))
-	println(site.Addr, site.Title)
+	fmt.Fprintln(conn, (site.Addr + "\t" + site.Message))
+	println(site.Addr, site.Message)
 	io.Copy(conn, conn)
 }

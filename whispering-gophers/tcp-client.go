@@ -4,8 +4,6 @@
  *
  * usage: go run sending-message-to-a-peer.go hoge
  *
- *
- *
  */
 
 package main
@@ -17,8 +15,16 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
+	"sync"
 )
 import "os"
+
+type Peers struct {
+	m  map[string]chan<- Message
+	mu sync.RWMutex
+}
+
+type Message string
 
 type Site struct {
 	Addr    string
@@ -75,7 +81,10 @@ func reactiveMessage(msgCh chan string, conn net.Conn, servAddr string) {
 }
 
 func main() {
-	addr, err := ioutil.ReadFile("/tmp/tcp-serv-addr")
+	servId := os.Args[1]
+	fileName := "/tmp/tcp-serv-" + servId
+
+	addr, err := ioutil.ReadFile(fileName)
 	check(err)
 	servAddr := string(addr)
 
