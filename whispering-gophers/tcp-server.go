@@ -51,16 +51,29 @@ func main() {
 	check(err)
 	defer l.Close()
 
+	fileName = "/tmp/tcp-peer-" + servId
+	addr, err := ioutil.ReadFile(fileName)
+	check(err)
+	servAddr := string(addr)
+
+	clConn, err := net.Dial("tcp", servAddr)
+	check(err)
+
+	//TODO: define channel and give handleRequest
 	for {
 		conn, err := l.Accept()
 		check(err)
-		go handleRequest(conn, l.Addr().String())
+		go handleRequest(conn, clConn, l.Addr().String())
 	}
+
+	//TODO: use channel above and get a message from it and give new method
+	// call peer server
+
 }
 
-func handleRequest(conn net.Conn, addr string) {
+func handleRequest(conn net.Conn, clConn net.Conn, addr string) {
+	// server
 	defer conn.Close()
-
 	buf := make([]byte, 1024)
 	reqLen, err := conn.Read(buf)
 	check(err)
@@ -71,7 +84,22 @@ func handleRequest(conn net.Conn, addr string) {
 	check(err)
 
 	site.Addr = addr
-	fmt.Fprintln(conn, (site.Addr + "\t" + site.Message))
 	println(site.Addr, site.Message)
+	fmt.Fprintln(conn, (site.Addr + "\t" + site.Message))
 	io.Copy(conn, conn)
+
+	// client
+	defer clConn.Close()
+	_, err = clConn.Write([]byte(s))
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+	reply := make([]byte, 1024)
+	_, err = clConn.Read(reply)
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+	io.Copy(clConn, clConn)
 }
