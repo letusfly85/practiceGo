@@ -34,6 +34,7 @@ type Site struct {
 
 func check(e error) {
 	if e != nil {
+		println(e)
 		log.Fatal(e)
 	}
 }
@@ -72,6 +73,7 @@ func reactiveMessage(msgCh chan string, conn net.Conn, servAddr string) {
 			reply := make([]byte, 1024)
 			_, err = conn.Read(reply)
 			if err != nil {
+				println("here2!")
 				log.Fatal(err)
 				os.Exit(1)
 			}

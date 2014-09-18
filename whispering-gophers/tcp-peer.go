@@ -11,7 +11,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net"
@@ -43,20 +42,21 @@ func check(e error) {
 func handleRequest(conn net.Conn, addr string) {
 	defer conn.Close()
 
-	buf := make([]byte, 1024)
-	reqLen, err := conn.Read(buf)
-	check(err)
-	println(reqLen)
-	s := string(buf[:reqLen])
+	for {
+		buf := make([]byte, 1024)
+		reqLen, err := conn.Read(buf)
+		check(err)
+		s := string(buf[:reqLen])
 
-	site := new(Site)
-	err = json.Unmarshal([]byte(s), &site)
-	check(err)
+		site := new(Site)
+		err = json.Unmarshal([]byte(s), &site)
+		check(err)
 
-	site.Addr = addr
-	fmt.Fprintln(conn, (site.Addr + "\t" + site.Message))
-	println(site.Addr, site.Message)
-	io.Copy(conn, conn)
+		site.Addr = addr
+		fmt.Fprintln(conn, (site.Addr + "\t" + site.Message))
+		println(site.Addr, site.Message)
+		println(site.Addr)
+	}
 }
 
 func main() {

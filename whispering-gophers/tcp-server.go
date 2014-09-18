@@ -12,7 +12,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
+	"bytes"
 	"io/ioutil"
 	"log"
 	"net"
@@ -55,51 +55,60 @@ func main() {
 	addr, err := ioutil.ReadFile(fileName)
 	check(err)
 	servAddr := string(addr)
+	println(servAddr)
 
-	clConn, err := net.Dial("tcp", servAddr)
+	msgCh := make(chan Site, 100)
+
+	peer, err := net.Dial("tcp", servAddr)
 	check(err)
+	defer peer.Close()
 
-	//TODO: define channel and give handleRequest
 	for {
+		go func() {
+			for {
+				select {
+					case site, ok :=<-msgCh:
+						if !ok {
+							println("err!")
+							os.Exit(1)
+						}
+						println("send!")
+						println(site.Message)
+
+						var b bytes.Buffer
+						enc := json.NewEncoder(&b)
+						err = enc.Encode(site)
+						check(err)
+
+						str := b.String()
+						_, err = peer.Write([]byte(str))
+						check(err)
+				}
+			}
+		}()
 		conn, err := l.Accept()
 		check(err)
-		go handleRequest(conn, clConn, l.Addr().String())
+		go handleRequest(conn, msgCh, l.Addr().String())
 	}
-
-	//TODO: use channel above and get a message from it and give new method
-	// call peer server
-
 }
 
-func handleRequest(conn net.Conn, clConn net.Conn, addr string) {
+func handleRequest(conn net.Conn, msgCh chan Site, addr string) {
 	// server
 	defer conn.Close()
-	buf := make([]byte, 1024)
-	reqLen, err := conn.Read(buf)
-	check(err)
-	s := string(buf[:reqLen])
+	for {
+		buf := make([]byte, 1024)
+		reqLen, err := conn.Read(buf)
+		check(err)
+		s := string(buf[:reqLen])
 
-	site := new(Site)
-	err = json.Unmarshal([]byte(s), &site)
-	check(err)
+		site := new(Site)
+		err = json.Unmarshal([]byte(s), &site)
+		check(err)
 
-	site.Addr = addr
-	println(site.Addr, site.Message)
-	fmt.Fprintln(conn, (site.Addr + "\t" + site.Message))
-	io.Copy(conn, conn)
+		site.Addr = addr
+		println(site.Addr, site.Message)
+		fmt.Fprintln(conn, (site.Addr + "\t" + site.Message))
 
-	// client
-	defer clConn.Close()
-	_, err = clConn.Write([]byte(s))
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
+		msgCh <-*site
 	}
-	reply := make([]byte, 1024)
-	_, err = clConn.Read(reply)
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-	io.Copy(clConn, clConn)
 }
