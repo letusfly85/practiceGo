@@ -16,25 +16,25 @@ Go学習用のリポジトリです。
 
 refs: http://whispering-gophers.appspot.com/
 
-[whispering-gophers](whispering-gophers/README.md)
+readme: [whispering-gophers](whispering-gophers/README.md)
 
 ### yaml
 
-refs: https://github.com/go-yaml/yaml
+refs: [github.com/go-yaml/yaml](https://github.com/go-yaml/yaml)
 
-[yaml](yaml/README.md)
+readme: [yaml](yaml/README.md)
 
 
 ### configuration
 
-refs: https://code.google.com/p/gcfg/
+refs: [code.google.com/p/gcfg](https://code.google.com/p/gcfg/)
 
-[gcfg](gcfg/README.md)
+readme: [gcfg](gcfg/README.md)
 
 
 ### test
 
-refs: http://golang.org/pkg/go/build/
-refs: http://qiita.com/Jxck\_/items/8717a5982547cfa54ebc
+refs: [golang.org/~/build](http://golang.org/pkg/go/build/)
+refs: [qiita](http://qiita.com/Jxck\_/items/8717a5982547cfa54ebc)
 
-[test](mytest/README.md)
+readme: [test](mytest/README.md)
