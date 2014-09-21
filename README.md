@@ -30,3 +30,11 @@ refs: https://github.com/go-yaml/yaml
 refs: https://code.google.com/p/gcfg/
 
 [gcfg](gcfg/README.md)
+
+
+### test
+
+refs: http://golang.org/pkg/go/build/
+refs: http://qiita.com/Jxck\_/items/8717a5982547cfa54ebc
+
+[test](mytest/README.md)
