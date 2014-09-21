@@ -1,0 +1,4 @@
+; it is comment line
+[section]
+name = wada.shunsuke # it is also comment
+flg          # implicit value for bool is true

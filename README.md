@@ -18,8 +18,15 @@ refs: http://whispering-gophers.appspot.com/
 
 [whispering-gophers](whispering-gophers/README.md)
 
-### yaml 処理
+### yaml
 
 refs: https://github.com/go-yaml/yaml
 
 [yaml](yaml/README.md)
+
+
+### configuration
+
+refs: https://code.google.com/p/gcfg/
+
+[yaml](gcfg/README.md)
