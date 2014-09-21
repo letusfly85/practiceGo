@@ -6,40 +6,19 @@
  *
  */
 
-package main
+package myserver
 
 import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net"
 	"os"
-	"sync"
 
 	"code.google.com/p/whispering-gophers/util"
 )
 
-type Peers struct {
-	m  map[string]chan<- Message
-	mu sync.RWMutex
-}
-
-type Message string
-
-type Site struct {
-	Addr    string
-	Message string
-	URL     string
-}
-
-func check(e error) {
-	if e != nil {
-		log.Fatal(e)
-	}
-}
-
-func handleRequest(conn net.Conn, addr string) {
+func peer2peer(conn net.Conn, addr string) {
 	defer conn.Close()
 
 	for {
@@ -55,11 +34,10 @@ func handleRequest(conn net.Conn, addr string) {
 		site.Addr = addr
 		fmt.Fprintln(conn, (site.Addr + "\t" + site.Message))
 		println(site.Addr, site.Message)
-		println(site.Addr)
 	}
 }
 
-func main() {
+func peer() {
 	l, err := util.Listen()
 	check(err)
 
@@ -74,6 +52,6 @@ func main() {
 	for {
 		conn, err := l.Accept()
 		check(err)
-		go handleRequest(conn, l.Addr().String())
+		go peer2peer(conn, l.Addr().String())
 	}
 }

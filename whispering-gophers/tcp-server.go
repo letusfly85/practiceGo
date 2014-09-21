@@ -7,39 +7,18 @@
  *
  */
 
-package main
+package myserver
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"bytes"
 	"io/ioutil"
-	"log"
 	"net"
 	"os"
-	"sync"
 
 	"code.google.com/p/whispering-gophers/util"
 )
-
-type Peers struct {
-	m  map[string]chan<- Message
-	mu sync.RWMutex
-}
-
-type Message string
-
-type Site struct {
-	Addr    string
-	Message string
-	URL     string
-}
-
-func check(e error) {
-	if e != nil {
-		log.Fatal(e)
-	}
-}
 
 func main() {
 	l, err := util.Listen()
@@ -54,35 +33,31 @@ func main() {
 	fileName = "/tmp/tcp-peer-" + servId
 	addr, err := ioutil.ReadFile(fileName)
 	check(err)
+
 	servAddr := string(addr)
-	println(servAddr)
-
-	msgCh := make(chan Site, 100)
-
 	peer, err := net.Dial("tcp", servAddr)
 	check(err)
 	defer peer.Close()
 
+	msgCh := make(chan Site, 100)
 	for {
 		go func() {
 			for {
 				select {
-					case site, ok :=<-msgCh:
-						if !ok {
-							println("err!")
-							os.Exit(1)
-						}
-						println("send!")
-						println(site.Message)
+				case site, ok := <-msgCh:
+					if !ok {
+						println("err!")
+						os.Exit(1)
+					}
 
-						var b bytes.Buffer
-						enc := json.NewEncoder(&b)
-						err = enc.Encode(site)
-						check(err)
+					var b bytes.Buffer
+					enc := json.NewEncoder(&b)
+					err = enc.Encode(site)
+					check(err)
 
-						str := b.String()
-						_, err = peer.Write([]byte(str))
-						check(err)
+					str := b.String()
+					_, err = peer.Write([]byte(str))
+					check(err)
 				}
 			}
 		}()
@@ -93,7 +68,6 @@ func main() {
 }
 
 func handleRequest(conn net.Conn, msgCh chan Site, addr string) {
-	// server
 	defer conn.Close()
 	for {
 		buf := make([]byte, 1024)
@@ -109,6 +83,6 @@ func handleRequest(conn net.Conn, msgCh chan Site, addr string) {
 		println(site.Addr, site.Message)
 		fmt.Fprintln(conn, (site.Addr + "\t" + site.Message))
 
-		msgCh <-*site
+		msgCh <- *site
 	}
 }

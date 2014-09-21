@@ -6,38 +6,16 @@
  *
  */
 
-package main
+package myserver
 
 import (
 	"bufio"
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net"
-	"sync"
 )
 import "os"
-
-type Peers struct {
-	m  map[string]chan<- Message
-	mu sync.RWMutex
-}
-
-type Message string
-
-type Site struct {
-	Addr    string
-	Message string
-	URL     string
-}
-
-func check(e error) {
-	if e != nil {
-		println(e)
-		log.Fatal(e)
-	}
-}
 
 var (
 	msgCh chan string
@@ -65,24 +43,17 @@ func reactiveMessage(msgCh chan string, conn net.Conn, servAddr string) {
 
 			str := b.String()
 			_, err = conn.Write([]byte(str))
-			if err != nil {
-				log.Fatal(err)
-				os.Exit(1)
-			}
+			checkAndExit(err)
 
 			reply := make([]byte, 1024)
 			_, err = conn.Read(reply)
-			if err != nil {
-				println("here2!")
-				log.Fatal(err)
-				os.Exit(1)
-			}
+			checkAndExit(err)
 			println("reply from server=", string(reply))
 		}
 	}
 }
 
-func main() {
+func callServer() {
 	servId := os.Args[1]
 	fileName := "/tmp/tcp-serv-" + servId
 
