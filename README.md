@@ -29,4 +29,4 @@ refs: https://github.com/go-yaml/yaml
 
 refs: https://code.google.com/p/gcfg/
 
-[yaml](gcfg/README.md)
+[gcfg](gcfg/README.md)
