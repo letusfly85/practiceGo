@@ -5,16 +5,22 @@
 
 https://github.com/letusfly85/practiceGo/wiki/Index
 
-## 説明
+## explain
 
 Go学習用のリポジトリです。
 
+体系立てる事はせず、気になるところからごりごりと学習していく過程を残しています。
 
-### example.go
+
+### gobyexample
+
+* refs  : [gobyexample](https://gobyexample.com/)
+
+* readme: 準備中
 
 ### whispering-gophers
 
-* refs  : http://whispering-gophers.appspot.com/
+* refs  : [whispering-gophers](http://whispering-gophers.appspot.com/)
 
 * readme: [whispering-gophers](whispering-gophers/README.md)
 
