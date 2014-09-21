@@ -1,13 +1,11 @@
 package mytest
 
-func MySum(x int) int {
-	return 2 * x
-}
+func MySum(xs ...int) int {
+	acc := 0
 
-func MySum2(x int) int {
-	return 4 * x
-}
+	for _, val := range xs {
+		acc = acc + val
+	}
 
-func main() {
-	println("hello")
+	return acc
 }
