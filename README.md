@@ -2,6 +2,7 @@
 
 ## Wiki
 
+
 https://github.com/letusfly85/practiceGo/wiki/Index
 
 ## 説明
@@ -9,10 +10,16 @@ https://github.com/letusfly85/practiceGo/wiki/Index
 Go学習用のリポジトリです。
 
 
+### example.go
+
 ### whispering-gophers
 
-以下サイトを参考にお題含め実装していきます。
-
-http://whispering-gophers.appspot.com/
+refs: http://whispering-gophers.appspot.com/
 
 [whispering-gophers](whispering-gophers/README.md)
+
+### yaml 処理
+
+refs: https://github.com/go-yaml/yaml
+
+[yaml](yaml/README.md)
