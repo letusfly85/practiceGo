@@ -7,64 +7,82 @@
  *
  */
 
-package main
+package myserver
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"log"
 	"net"
+	"os"
 
 	"code.google.com/p/whispering-gophers/util"
 )
 
-type Site struct {
-	Addr  string
-	Title string
-	URL   string
-}
-
-func check(e error) {
-	if e != nil {
-		log.Fatal(e)
-	}
-}
-
 func main() {
 	l, err := util.Listen()
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println(l.Addr())
-	err = ioutil.WriteFile("/tmp/tcp-serv-addr", ([]byte(l.Addr().String())), 0644)
+	check(err)
+
+	servId := os.Args[1]
+	fileName := "/tmp/tcp-serv-" + servId
+	err = ioutil.WriteFile(fileName, ([]byte(l.Addr().String())), 0644)
 	check(err)
 	defer l.Close()
 
+	fileName = "/tmp/tcp-peer-" + servId
+	addr, err := ioutil.ReadFile(fileName)
+	check(err)
+
+	servAddr := string(addr)
+	peer, err := net.Dial("tcp", servAddr)
+	check(err)
+	defer peer.Close()
+
+	msgCh := make(chan Site, 100)
 	for {
+		go func() {
+			for {
+				select {
+				case site, ok := <-msgCh:
+					if !ok {
+						println("err!")
+						os.Exit(1)
+					}
+
+					var b bytes.Buffer
+					enc := json.NewEncoder(&b)
+					err = enc.Encode(site)
+					check(err)
+
+					str := b.String()
+					_, err = peer.Write([]byte(str))
+					check(err)
+				}
+			}
+		}()
 		conn, err := l.Accept()
-		if err != nil {
-			log.Fatal(err)
-		}
-		go handleRequest(conn, l.Addr().String())
+		check(err)
+		go handleRequest(conn, msgCh, l.Addr().String())
 	}
 }
 
-func handleRequest(conn net.Conn, addr string) {
+func handleRequest(conn net.Conn, msgCh chan Site, addr string) {
 	defer conn.Close()
+	for {
+		buf := make([]byte, 1024)
+		reqLen, err := conn.Read(buf)
+		check(err)
+		s := string(buf[:reqLen])
 
-	buf := make([]byte, 1024)
-	reqLen, err := conn.Read(buf)
-	if err != nil {
-		println("Error reading:", err.Error())
+		site := new(Site)
+		err = json.Unmarshal([]byte(s), &site)
+		check(err)
+
+		site.Addr = addr
+		println(site.Addr, site.Message)
+		fmt.Fprintln(conn, (site.Addr + "\t" + site.Message))
+
+		msgCh <- *site
 	}
-	s := string(buf[:reqLen])
-
-	site := new(Site)
-	err = json.Unmarshal([]byte(s), &site)
-	site.Addr = addr
-	fmt.Fprintln(conn, (site.Addr + "\t" + site.Title))
-	println(site.Addr, site.Title)
-	io.Copy(conn, conn)
 }

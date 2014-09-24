@@ -4,33 +4,18 @@
  *
  * usage: go run sending-message-to-a-peer.go hoge
  *
- *
- *
  */
 
-package main
+package myserver
 
 import (
 	"bufio"
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net"
 )
 import "os"
-
-type Site struct {
-	Addr    string
-	Message string
-	URL     string
-}
-
-func check(e error) {
-	if e != nil {
-		log.Fatal(e)
-	}
-}
 
 var (
 	msgCh chan string
@@ -58,24 +43,21 @@ func reactiveMessage(msgCh chan string, conn net.Conn, servAddr string) {
 
 			str := b.String()
 			_, err = conn.Write([]byte(str))
-			if err != nil {
-				log.Fatal(err)
-				os.Exit(1)
-			}
+			checkAndExit(err)
 
 			reply := make([]byte, 1024)
 			_, err = conn.Read(reply)
-			if err != nil {
-				log.Fatal(err)
-				os.Exit(1)
-			}
+			checkAndExit(err)
 			println("reply from server=", string(reply))
 		}
 	}
 }
 
-func main() {
-	addr, err := ioutil.ReadFile("/tmp/tcp-serv-addr")
+func callServer() {
+	servId := os.Args[1]
+	fileName := "/tmp/tcp-serv-" + servId
+
+	addr, err := ioutil.ReadFile(fileName)
 	check(err)
 	servAddr := string(addr)
 
