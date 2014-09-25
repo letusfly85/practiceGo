@@ -4,6 +4,7 @@ import (
 	"log"
 	"os/exec"
 	"strconv"
+	"time"
 )
 
 func main() {
@@ -11,9 +12,10 @@ func main() {
 	for i := 0; i <= 10000; i++ {
 		_url := url + strconv.Itoa(i)
 		cmd := exec.Command("curl", "-XGET", _url)
+		time.Sleep(time.Millisecond * 500)
 		out, err := cmd.Output()
 
-		println(_url)
+		log.Printf("%v", _url)
 		if err != nil {
 			log.Fatal(err)
 		} else {
