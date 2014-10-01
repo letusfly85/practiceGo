@@ -7,6 +7,7 @@ package main
 
 import (
 	"bytes"
+	"code.google.com/p/gcfg"
 	"flag"
 	"io/ioutil"
 	"log"
@@ -16,16 +17,34 @@ import (
 	"time"
 )
 
+type Config struct {
+	Curl struct {
+		URL string
+	}
+}
+
+func check(err error) {
+	if err != nil {
+		log.Fatalf("error :%v\n", err)
+	}
+}
+
 func main() {
-	max_count := flag.Int("num", 10, "you can give a loop number to call curl command")
-	forkPattern := flag.Bool("fork", false, "if you want to fork, give true")
+	// command line 引数を受け取ります。
+	max_count := flag.Int("num", 10, "curlを実行する回数を設定できます。デフォルトでは10回になります。")
+	forkPattern := flag.Bool("fork", false, "バックグラウンドプロセス実行したいときにtrueを指定してください。デフォルトではfalseになります。")
 	flag.Parse()
 
 	if *forkPattern {
 		daemon()
 	}
 
-	url := "10.23.3.2/twem/users/1/change_name?name=hoge"
+	// 設定ファイルを読み込みます。
+	var cfg Config
+	err := gcfg.ReadFileInto(&cfg, "my-curl.conf")
+	check(err)
+
+	url := cfg.Curl.URL
 	for i := 0; i <= *max_count; i++ {
 		_url := url + strconv.Itoa(i)
 		_url = _url + "&age=" + strconv.Itoa(i)
@@ -34,31 +53,28 @@ func main() {
 		out, err := cmd.Output()
 
 		log.Printf("%v", _url)
-		if err != nil {
-			log.Fatal(err)
-		} else {
-			println(out)
-		}
+		check(err)
+		println(out)
 	}
 }
 
 // refs: https://github.com/astaxie/build-web-application-with-golang/blob/master/ja/ebook/12.3.md
 func daemon() {
 	//if *d {
-	cmd := exec.Command(os.Args[0],
-		"-close-fds",
-		//"-addr", *addr,
-		//"-call", *call,
-	)
+	cmd := exec.Command(os.Args[0])
+	//"-close-fds",
+	//"-addr", *addr,
+	//"-call", *call,
+
 	serr, err := cmd.StderrPipe()
-	if err != nil {
-		log.Fatalln(err)
-	}
+	check(err)
+
 	err = cmd.Start()
-	if err != nil {
-		log.Fatalln(err)
-	}
+	check(err)
+
 	s, err := ioutil.ReadAll(serr)
+	check(err)
+
 	s = bytes.TrimSpace(s)
 	if bytes.HasPrefix(s, []byte("addr: ")) {
 		println(string(s))
